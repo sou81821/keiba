@@ -1,0 +1,7 @@
+## 初期設定
+#### タイムゾーン変更
+- `sudo mv /etc/localtime /etc/localtime.default`
+- `sudo ln -s /usr/share/zoneinfo/Asia/Tokyo /etc/localtime`
+
+## Postgresql環境
+- 
