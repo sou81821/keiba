@@ -3,5 +3,14 @@
 - `sudo mv /etc/localtime /etc/localtime.default`
 - `sudo ln -s /usr/share/zoneinfo/Asia/Tokyo /etc/localtime`
 
-## Postgresql環境
+## 環境設定
+#### Postgresql環境
 - 
+
+#### git環境
+- `cd /usr/local/src/`
+- `wget https://github.com/git/git/archive/master.zip`
+- `yum install -y zlib-devel gcc openssl-devel curl libcurl-devel expat-devel perl-ExtUtils-MakeMaker tcl gettext`
+- `unzip master.zip`
+- `cd git-master/`
+- `make prefix=/usr/local install`

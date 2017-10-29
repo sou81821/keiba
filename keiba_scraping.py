@@ -277,10 +277,11 @@ def makeRaceDB(conn, cur):
 
 if __name__ == '__main__':
     year_l = [2010]
-    #pool = mp.Pool(__PROC__)
+    #pool = mp.Pool(__PROC__)C
     #pool.map(makeHorseDB, year_l)
 
-    conn = psycopg2.connect("dbname=keiba host=localhost user=sou")
+    conn = psycopg2.connect("dbname={0} host={1} user={2}".format(os.environ["PSQL_DB"], os.environ["PSQL_HOST"], os.environ["PSQL_USER"]))
+    # conn = psycopg2.connect("dbname=keiba host=localhost user=sou")
     cur = conn.cursor()
 
     for i, year in enumerate(year_l):

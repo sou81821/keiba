@@ -1,0 +1,12 @@
+## postgresql
+#### DB初期化
+- `sudo /etc/init.d/postgresql96 initdb`
+
+#### start
+- `sudo /etc/init.d/postgresql96 start`
+
+#### stop
+- `sudo /etc/init.d/postgresql96 stop`
+
+#### 自動起動設定
+- `sudo /sbin/chkconfig postgresql96 on`
