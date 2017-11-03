@@ -10,3 +10,6 @@
 
 #### 自動起動設定
 - `sudo /sbin/chkconfig postgresql96 on`
+
+#### 設定
+- `vi /var/lib/pgsql96/data/pg_hba.conf`

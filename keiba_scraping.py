@@ -156,7 +156,8 @@ def makeHorseDB(year, conn, cur):
             print(idx, e)
 
     # DB追加
-    engine=create_engine("postgresql://sou@localhost:5432/keiba")
+    # engine=create_engine("postgresql://sou@localhost:5432/keiba")
+    engine=create_engine("postgresql://{0}@{1}:{2}/keiba".format(os.environ["PSQL_USER"], os.environ["PSQL_HOST"], os.environ["PSQL_PORT"], os.environ["PSQL_DB"],))
     pd_horse.to_sql('horse', engine, if_exists='append', index=False)
 
 
@@ -267,9 +268,12 @@ def makeRaceDB(conn, cur):
             print(e)
 
     # DB追加
-    result_engine = create_engine("postgresql://sou@localhost:5432/keiba")
-    race_engine   = create_engine("postgresql://sou@localhost:5432/keiba")
-    odds_engine   = create_engine("postgresql://sou@localhost:5432/keiba")
+    # result_engine = create_engine("postgresql://sou@localhost:5432/keiba")
+    # race_engine   = create_engine("postgresql://sou@localhost:5432/keiba")
+    # odds_engine   = create_engine("postgresql://sou@localhost:5432/keiba")
+    result_engine = create_engine("postgresql://{0}@{1}:{2}/keiba".format(os.environ["PSQL_USER"], os.environ["PSQL_HOST"], os.environ["PSQL_PORT"], os.environ["PSQL_DB"],))
+    race_engine   = create_engine("postgresql://{0}@{1}:{2}/keiba".format(os.environ["PSQL_USER"], os.environ["PSQL_HOST"], os.environ["PSQL_PORT"], os.environ["PSQL_DB"],))
+    odds_engine   = create_engine("postgresql://{0}@{1}:{2}/keiba".format(os.environ["PSQL_USER"], os.environ["PSQL_HOST"], os.environ["PSQL_PORT"], os.environ["PSQL_DB"],))
     pd_result.to_sql('result', result_engine, if_exists='append', index=False)
     pd_race.to_sql('race', race_engine, if_exists='append', index=False)
     pd_odds.to_sql('odds', odds_engine, if_exists='append', index=False)
