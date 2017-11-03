@@ -47,10 +47,8 @@ def data_to_csv(horse_data, year):
 # 馬の情報を集める
 def makeHorseDB(year, conn, cur):
     horse_url = 'http://db.netkeiba.com/horse/'
-    # idx_from = 100000
-    idx_from = 106000
-    idx_to   = 106050
-    # idx_to = 111000
+    idx_from = 100000
+    idx_to   = 111000
 
     # cur.execute('create table horse(id varchar(20), name varchar(30), tihou_horse_flg int, foreign_horse_flg int, sex varchar(10), hair varchar(30), father varchar(30), mother varchar(30), m_father varchar(30), birthday varchar(30), tyokyoshi text, owner text, price text);')
     # conn.commit()
@@ -280,7 +278,7 @@ def makeRaceDB(conn, cur):
 
 
 if __name__ == '__main__':
-    year_l = [2010]
+    year_l = [2000]
     #pool = mp.Pool(__PROC__)C
     #pool.map(makeHorseDB, year_l)
 
