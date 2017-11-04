@@ -278,7 +278,7 @@ def makeRaceDB(conn, cur):
 
 
 if __name__ == '__main__':
-    year_l = [2000]
+    year_l = [i for i in range(2001,2016)]
     #pool = mp.Pool(__PROC__)C
     #pool.map(makeHorseDB, year_l)
 
@@ -286,7 +286,7 @@ if __name__ == '__main__':
     # conn = psycopg2.connect("dbname=keiba host=localhost user=sou")
     cur = conn.cursor()
 
-    for i, year in enumerate(year_l):
+    for year in year_l:
         makeHorseDB(year, conn, cur)
 
     # makeRaceDB(conn, cur)
