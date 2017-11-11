@@ -162,9 +162,8 @@ def makeHorseDB(year, conn, cur):
 
 
 # レース情報を集める
-def makeRaceDB(conn, cur):
+def makeRaceDB(year, conn, cur):
     race_url = 'http://db.netkeiba.com/race/'
-    year_l  = [str(i) for i in range(2011, 2016)]
     # 1:札幌, 2:函館, 3:福島, 4:新潟, 5:東京, 6:中山, 7:中京, 8:京都, 9:阪神, 10:小倉
     place_l = [str(i).zfill(2) for i in range(1, 11)]
     time_l  = [str(i).zfill(2) for i in range(1, 7)]
@@ -177,7 +176,7 @@ def makeRaceDB(conn, cur):
 
     pd_odds = pd.DataFrame([], columns=['race_id', 'type', 'kaime', 'odds', 'popularity'])
 
-    for year, place, r_time, day, race_order in itertools.product(year_l, place_l, time_l, day_l, race_l):
+    for place, r_time, day, race_order in itertools.product(place_l, time_l, day_l, race_l):
         try:
             # 過度なアクセスを抑えるために待ち時間を設定
             time.sleep(2)
@@ -287,9 +286,8 @@ if __name__ == '__main__':
     cur = conn.cursor()
 
     for year in year_l:
-        makeHorseDB(year, conn, cur)
-
-    # makeRaceDB(conn, cur)
+        # makeHorseDB(year, conn, cur)
+        makeRaceDB(year, conn, cur)
 
     cur.close()
     conn.close()
