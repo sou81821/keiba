@@ -177,7 +177,7 @@ def makeRaceDB(year, conn, cur):
     pd_odds = pd.DataFrame([], columns=['race_id', 'type', 'kaime', 'odds', 'popularity'])
 
     for place, r_time, day, race_order in itertools.product(place_l, time_l, day_l, race_l):
-        try:
+        # try:
             # 過度なアクセスを抑えるために待ち時間を設定
             time.sleep(2)
 
@@ -261,16 +261,16 @@ def makeRaceDB(year, conn, cur):
             race_series = pd.Series([race_id, race_name, year, place, r_time, day, race_order, race_type, race_direction, race_distance, race_whether, race_baba, lap, pace], index=pd_race.columns)
             pd_race = pd_race.append(race_series, ignore_index = True)
 
-        except Exception as e:
-            print(e)
+        # except Exception as e:
+            # print(e)
 
     # DB追加
-    # result_engine = create_engine("postgresql://sou@localhost:5432/keiba")
-    # race_engine   = create_engine("postgresql://sou@localhost:5432/keiba")
-    # odds_engine   = create_engine("postgresql://sou@localhost:5432/keiba")
-    result_engine = create_engine("postgresql://{0}@{1}:{2}/keiba".format(os.environ["PSQL_USER"], os.environ["PSQL_HOST"], os.environ["PSQL_PORT"], os.environ["PSQL_DB"],))
-    race_engine   = create_engine("postgresql://{0}@{1}:{2}/keiba".format(os.environ["PSQL_USER"], os.environ["PSQL_HOST"], os.environ["PSQL_PORT"], os.environ["PSQL_DB"],))
-    odds_engine   = create_engine("postgresql://{0}@{1}:{2}/keiba".format(os.environ["PSQL_USER"], os.environ["PSQL_HOST"], os.environ["PSQL_PORT"], os.environ["PSQL_DB"],))
+    result_engine = create_engine("postgresql://sou@localhost:5432/keiba")
+    race_engine   = create_engine("postgresql://sou@localhost:5432/keiba")
+    odds_engine   = create_engine("postgresql://sou@localhost:5432/keiba")
+    # result_engine = create_engine("postgresql://{0}@{1}:{2}/keiba".format(os.environ["PSQL_USER"], os.environ["PSQL_HOST"], os.environ["PSQL_PORT"], os.environ["PSQL_DB"],))
+    # race_engine   = create_engine("postgresql://{0}@{1}:{2}/keiba".format(os.environ["PSQL_USER"], os.environ["PSQL_HOST"], os.environ["PSQL_PORT"], os.environ["PSQL_DB"],))
+    # odds_engine   = create_engine("postgresql://{0}@{1}:{2}/keiba".format(os.environ["PSQL_USER"], os.environ["PSQL_HOST"], os.environ["PSQL_PORT"], os.environ["PSQL_DB"],))
     pd_result.to_sql('result', result_engine, if_exists='append', index=False)
     pd_race.to_sql('race', race_engine, if_exists='append', index=False)
     pd_odds.to_sql('odds', odds_engine, if_exists='append', index=False)
@@ -281,8 +281,8 @@ if __name__ == '__main__':
     #pool = mp.Pool(__PROC__)C
     #pool.map(makeHorseDB, year_l)
 
-    conn = psycopg2.connect("dbname={0} host={1} user={2} port={3} password={4}".format(os.environ["PSQL_DB"], os.environ["PSQL_HOST"], os.environ["PSQL_USER"], os.environ["PSQL_PORT"], os.environ["PSQL_PASS"]))
-    # conn = psycopg2.connect("dbname=keiba host=localhost user=sou")
+    # conn = psycopg2.connect("dbname={0} host={1} user={2} port={3} password={4}".format(os.environ["PSQL_DB"], os.environ["PSQL_HOST"], os.environ["PSQL_USER"], os.environ["PSQL_PORT"], os.environ["PSQL_PASS"]))
+    conn = psycopg2.connect("dbname=keiba host=localhost user=sou")
     cur = conn.cursor()
 
     for year in year_l:
