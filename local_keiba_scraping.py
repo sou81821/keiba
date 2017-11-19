@@ -182,6 +182,7 @@ def makeRaceDB(year, conn, cur):
             time.sleep(2)
 
             race_id = str(year) + place + r_time + day + race_order
+            race_id = '200103020105'
             url     = race_url + race_id
             src_html = ul.request.urlopen(url).read()
             root = BeautifulSoup(src_html)
@@ -196,7 +197,7 @@ def makeRaceDB(year, conn, cur):
             race_name = race_info.find('h1').text   # レース名
             race_type = race_info.find('span').text.replace('\xa0', '').split('/')[0][0]        # 芝 or ダート
             race_direction = race_info.find('span').text.replace('\xa0', '').split('/')[0][1]   # 左回り or 右回り
-            race_distance  = int(race_info.find('span').text.replace('\xa0', '').split('/')[0][2:].strip('m'))   # 距離
+            race_distance  = int(race_info.find('span').text.replace('\xa0', '').split('/')[0][::-1][:5][::-1].strip('m'))
             race_whether   = race_info.find('span').text.replace('\xa0', '').split('/')[1].split(':')[1].strip(' ')   # 天候
             race_baba      = race_info.find('span').text.replace('\xa0', '').split('/')[2].split(':')[1].strip(' ')   # 馬場状況
 
