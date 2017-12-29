@@ -184,6 +184,7 @@ def makeRaceDB(year, conn, cur):
             race_id = str(year) + place + r_time + day + race_order
             race_id = '200103020105'
             url     = race_url + race_id
+            url = 'http://db.netkeiba.com/race/201510020104'
             src_html = ul.request.urlopen(url).read()
             root = BeautifulSoup(src_html)
 
@@ -257,6 +258,7 @@ def makeRaceDB(year, conn, cur):
 
             # ラップタイムを取得
             lap_time = root.find('table', summary='ラップタイム').find_all('td')
+            pdb.set_trace()
             lap  = lap_time[0].text   # ラップ
             pace = lap_time[1].text   # ペース
             race_series = pd.Series([race_id, race_name, year, place, r_time, day, race_order, race_type, race_direction, race_distance, race_whether, race_baba, lap, pace], index=pd_race.columns)

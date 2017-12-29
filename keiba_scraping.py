@@ -172,7 +172,7 @@ def makeRaceDB(year, conn, cur):
 
     pd_result = pd.DataFrame([], columns=['horse_id', 'race_id', 'goal', 'waku_ban', 'uma_ban', 'horse_name', 'horse_sex', 'horse_age', 'weight', 'jockey', 'race_time', 'margin', 'passing_first', 'passing_second', 'passing_third', 'passing_forth', 'rise', 'win_odds', 'popularity', 'horse_weight', 'horse_weight_change', 'tyokyoshi', 'owner', 'prize'])
 
-    pd_race = pd.DataFrame([], columns=['race_id', 'race_name', 'race_year', 'race_place', 'race_time', 'race_day', 'race_order', 'race_type', 'race_direction', 'race_distance', 'race_whether', 'race_baba', 'lap', 'pace'])
+    pd_race = pd.DataFrame([], columns=['race_id', 'race_name', 'race_year', 'race_place', 'race_time', 'race_day', 'race_order', 'race_type', 'race_direction', 'race_distance', 'race_whether', 'race_baba', 'lap', 'pace', 'horse_count'])
 
     pd_odds = pd.DataFrame([], columns=['race_id', 'type', 'kaime', 'odds', 'popularity'])
 
@@ -201,8 +201,11 @@ def makeRaceDB(year, conn, cur):
             race_baba      = race_info.find('span').text.replace('\xa0', '').split('/')[2].split(':')[1].strip(' ')   # 馬場状況
 
             # レース結果を取得
+            horse_count   = 0
+            race_win_time = 0
             results = root.find('table', class_='race_table_01 nk_tb_common').find_all('tr')[1:]
             for result in results:
+                horse_count += 1
                 result_record = result.find_all('td')
                 goal = result_record[0].text         # 着順（「取」・「除」が存在）
                 waku_ban = result_record[1].text     # 枠順
@@ -214,6 +217,8 @@ def makeRaceDB(year, conn, cur):
                 weight    = float(result_record[5].text)   # 斤量
                 jockey    = result_record[6].text.strip('\n')   # 騎手
                 race_time = float(result_record[7].text.split(':')[0])*60 + float(result_record[7].text.split(':')[1]) if len(result_record[7].text) > 0 else 0  # レースタイム
+                if horse_count == 1:    # １着のレースタイム
+                    race_win_time = float(result_record[7].text.split(':')[0])*60 + float(result_record[7].text.split(':')[1]) if len(result_record[7].text) > 0 else 0
                 margin    = result_record[8].text    # 着差
                 passing_first  = ''    # 第１コーナー通過順位（最終コーナー３個前）
                 passing_second = ''    # 第２コーナー通過順位（最終コーナー２個前）
@@ -258,7 +263,7 @@ def makeRaceDB(year, conn, cur):
             lap_time = root.find('table', summary='ラップタイム').find_all('td')
             lap  = lap_time[0].text   # ラップ
             pace = lap_time[1].text   # ペース
-            race_series = pd.Series([race_id, race_name, year, place, r_time, day, race_order, race_type, race_direction, race_distance, race_whether, race_baba, lap, pace], index=pd_race.columns)
+            race_series = pd.Series([race_id, race_name, year, place, r_time, day, race_order, race_type, race_direction, race_distance, race_whether, race_baba, lap, pace, race_win_time], index=pd_race.columns)
             pd_race = pd_race.append(race_series, ignore_index = True)
 
         except Exception as e:
@@ -277,7 +282,7 @@ def makeRaceDB(year, conn, cur):
 
 
 if __name__ == '__main__':
-    year_l = [i for i in range(2001,2016)]
+    year_l = [i for i in range(2008,2018)]
     #pool = mp.Pool(__PROC__)C
     #pool.map(makeHorseDB, year_l)
 
@@ -292,11 +297,6 @@ if __name__ == '__main__':
 
     cur.close()
     conn.close()
-
-
-
-
-
 
 
 

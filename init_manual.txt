@@ -14,3 +14,8 @@
 - `unzip master.zip`
 - `cd git-master/`
 - `make prefix=/usr/local install`
+
+
+#### やること
+- 2017,2016年のレースデータのスクレイピング
+- 馬でなくレースのレースタイム（１着馬のレースタイム）
