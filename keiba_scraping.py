@@ -172,9 +172,13 @@ def makeRaceDB(year, conn, cur):
 
     pd_result = pd.DataFrame([], columns=['horse_id', 'race_id', 'goal', 'waku_ban', 'uma_ban', 'horse_name', 'horse_sex', 'horse_age', 'weight', 'jockey', 'race_time', 'margin', 'passing_first', 'passing_second', 'passing_third', 'passing_forth', 'rise', 'win_odds', 'popularity', 'horse_weight', 'horse_weight_change', 'tyokyoshi', 'owner', 'prize'])
 
-    pd_race = pd.DataFrame([], columns=['race_id', 'race_name', 'race_year', 'race_place', 'race_time', 'race_day', 'race_order', 'race_type', 'race_direction', 'race_distance', 'race_whether', 'race_baba', 'lap', 'pace', 'horse_count'])
+    pd_race = pd.DataFrame([], columns=['race_id', 'race_name', 'race_year', 'race_place', 'race_time', 'race_day', 'race_order', 'race_type', 'race_direction', 'race_distance', 'race_whether', 'race_baba', 'lap', 'pace', 'race_win_time', 'horse_count'])
+
+    pd_race_name = pd.DataFrame([], columns=['race_name_id', 'race_name', 'race_name_yomi', 'race_rank'])
 
     pd_odds = pd.DataFrame([], columns=['race_id', 'type', 'kaime', 'odds', 'popularity'])
+
+    race_names = {}
 
     for place, r_time, day, race_order in itertools.product(place_l, time_l, day_l, race_l):
         try:
@@ -193,19 +197,52 @@ def makeRaceDB(year, conn, cur):
 
             # レース情報を取得
             race_info = root.find('dl', class_='racedata')
+            race_info_detail = root.find('p', class_='smalltxt').text
             race_name = race_info.find('h1').text   # レース名
+            race_name = re.sub(r'\(.*\)', '', re.sub(r'第.+回', '', race_name))
+            race_name_id = ''
+            race_sex_mix_flg = 1 if '(混)' in root.find('p', class_='smalltxt').text else 0     # 牡馬混合戦か
             race_type = race_info.find('span').text.replace('\xa0', '').split('/')[0][0]        # 芝 or ダート
             race_direction = race_info.find('span').text.replace('\xa0', '').split('/')[0][1]   # 左回り or 右回り
             race_distance  = int(race_info.find('span').text.replace('\xa0', '').split('/')[0][::-1][:5][::-1].strip('m'))
             race_whether   = race_info.find('span').text.replace('\xa0', '').split('/')[1].split(':')[1].strip(' ')   # 天候
             race_baba      = race_info.find('span').text.replace('\xa0', '').split('/')[2].split(':')[1].strip(' ')   # 馬場状況
 
+            # レース名テーブル回りの処理
+            race_rank = ''
+            if '(G1)' in race_name:
+                race_rank = 'G1'
+            elif '(G2)' in race_name:
+                race_rank = 'G2'
+            elif '(G3)' in race_name:
+                race_rank = 'G3'
+            elif '歳新馬' in race_info_detail:
+                race_rank = '新馬'
+            elif '歳未勝利' in race_info_detail:
+                race_rank = '未勝利'
+            elif '500万下' in race_info_detail:
+                race_rank = '500万下'
+            elif '1000万下' in race_info_detail:
+                race_rank = '1000万下'
+            elif '1600万下' in race_info_detail:
+                race_rank = '1600万下'
+            elif 'オープン' in race_info_detail:
+                race_rank = 'OP'
+
+            if race_name in race_names:
+                # すでに存在するkeyを割り当てる
+                race_name_id = race_names[race_name]['race_name_id']
+            else:
+                # race_namesに追加し，新規idを割り当てる
+                race_name_id = str(len(race_names)+1)
+                race_names[race_name] = {'race_name_id':race_name_id, 'race_rank':race_rank}
+            pdb.set_trace()
+
             # レース結果を取得
-            horse_count   = 0
             race_win_time = 0
             results = root.find('table', class_='race_table_01 nk_tb_common').find_all('tr')[1:]
+            horse_count = len(results)
             for result in results:
-                horse_count += 1
                 result_record = result.find_all('td')
                 goal = result_record[0].text         # 着順（「取」・「除」が存在）
                 waku_ban = result_record[1].text     # 枠順
@@ -263,7 +300,7 @@ def makeRaceDB(year, conn, cur):
             lap_time = root.find('table', summary='ラップタイム').find_all('td')
             lap  = lap_time[0].text   # ラップ
             pace = lap_time[1].text   # ペース
-            race_series = pd.Series([race_id, race_name, year, place, r_time, day, race_order, race_type, race_direction, race_distance, race_whether, race_baba, lap, pace, race_win_time], index=pd_race.columns)
+            race_series = pd.Series([race_id, race_name, year, place, r_time, day, race_order, race_type, race_direction, race_distance, race_whether, race_baba, lap, pace, race_win_time, horse_count], index=pd_race.columns)
             pd_race = pd_race.append(race_series, ignore_index = True)
 
         except Exception as e:
@@ -286,7 +323,8 @@ if __name__ == '__main__':
     #pool = mp.Pool(__PROC__)C
     #pool.map(makeHorseDB, year_l)
 
-    conn = psycopg2.connect("dbname={0} host={1} user={2} port={3} password={4}".format(os.environ["PSQL_DB"], os.environ["PSQL_HOST"], os.environ["PSQL_USER"], os.environ["PSQL_PORT"], os.environ["PSQL_PASS"]))
+    # conn = psycopg2.connect("dbname={0} host={1} user={2} port={3} password={4}".format(os.environ["PSQL_DB"], os.environ["PSQL_HOST"], os.environ["PSQL_USER"], os.environ["PSQL_PORT"], os.environ["PSQL_PASS"]))
+    conn = psycopg2.connect("dbname=keiba host=localhost user=sou")
     # conn = psycopg2.connect("dbname=keiba host=localhost user=sou")
     cur = conn.cursor()
 
